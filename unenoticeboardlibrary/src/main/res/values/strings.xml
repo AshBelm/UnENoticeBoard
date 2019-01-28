@@ -1,0 +1,10 @@
+<resources>
+    <string name="error_act_label">未捕获异常</string>
+    <string name="crash_info">崩溃信息：</string>
+    <string name="class_name">类名：</string>
+    <string name="method_name">法名：</string>
+    <string name="line_number">行数：</string>
+    <string name="error_type">类型：</string>
+    <string name="crash_time">时间：</string>
+    <string name="full_info">全部信息：</string>
+</resources>
