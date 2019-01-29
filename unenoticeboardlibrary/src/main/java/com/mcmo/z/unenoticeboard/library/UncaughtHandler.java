@@ -75,7 +75,7 @@ public class UncaughtHandler implements Thread.UncaughtExceptionHandler {
         AsyncTask task = new AsyncTask() {
             @Override
             protected Object doInBackground(Object[] objects) {
-                String content = InfoUtil.createBaseInfoString(exceptionInfo);
+                String content = InfoUtil.createFullInfoString(context, exceptionInfo);
                 FileIOUtils.writeFileFromString(logBasePath + File.separator + Cons.getLogFileName(exceptionInfo.getTime()), content);
                 return null;
             }

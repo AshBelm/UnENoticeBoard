@@ -75,7 +75,7 @@ public class ErrorActivity extends AppCompatActivity {
         tv_other.append("\n屏幕信息\n");
         tv_other.append(screenInfo.format());
         StorageInfo storageInfo = new StorageInfo(this);
-        tv_other.append("\n存储信\n");
+        tv_other.append("\n存储信息\n");
         tv_other.append(storageInfo.format());
     }
 
@@ -128,7 +128,7 @@ public class ErrorActivity extends AppCompatActivity {
             protected void onPostExecute(Object o) {
                 super.onPostExecute(o);
                 dismissProgressDialog();
-                Toast.makeText(ErrorActivity.this,R.string.delete_log_success,Toast.LENGTH_SHORT).show();
+                Toast.makeText(ErrorActivity.this, R.string.delete_log_success, Toast.LENGTH_SHORT).show();
             }
         }.execute();
 

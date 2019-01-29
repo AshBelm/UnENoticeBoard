@@ -125,8 +125,8 @@ public class StorageInfo implements FormatAble {
         } else if (m > 0) {
             float M = m + kb % ratio / ratioF;
             return String.format("%.2fM", M);
-        }else{
-            return kb+"KB";
+        } else {
+            return kb + "KB";
         }
     }
 
@@ -138,6 +138,9 @@ public class StorageInfo implements FormatAble {
      */
     @Override
     public String format() {
+        if (sdCardInfos == null) {
+            return "";
+        }
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < sdCardInfos.size(); i++) {
             switch (i) {
