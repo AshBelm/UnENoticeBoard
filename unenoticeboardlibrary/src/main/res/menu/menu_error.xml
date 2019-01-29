@@ -2,4 +2,5 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/menu_copyToClipboard" android:title="复制到剪切板"/>
     <item android:id="@+id/menu_showErrorFolderPath" android:title="显示日志路径"/>
+    <item android:id="@+id/menu_deleteLogFile" android:title="清除日志"/>
 </menu>

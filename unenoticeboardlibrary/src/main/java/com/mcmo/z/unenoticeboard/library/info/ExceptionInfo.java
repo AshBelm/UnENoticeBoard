@@ -101,9 +101,6 @@ public class ExceptionInfo implements Parcelable ,FormatAble {
     public long getTime() {
         return time;
     }
-    public String getTimeFormat(){
-        return new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date(time));
-    }
 
     public void setTime(long time) {
         this.time = time;

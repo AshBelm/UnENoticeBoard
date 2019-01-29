@@ -7,4 +7,8 @@
     <string name="error_type">类型：</string>
     <string name="crash_time">时间：</string>
     <string name="full_info">全部信息：</string>
+    <string name="keep_today_file">保留今天的日志</string>
+    <string name="delete_error_log_tip">删除日志</string>
+    <string name="delete_error_log_msg">日志删除后无法复原，是否删除</string>
+    <string name="delete_log_success">删除完成</string>
 </resources>

@@ -1,4 +1,4 @@
-package com.mcmo.z.unenoticeboard.library;
+package com.mcmo.z.unenoticeboard.library.util;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;

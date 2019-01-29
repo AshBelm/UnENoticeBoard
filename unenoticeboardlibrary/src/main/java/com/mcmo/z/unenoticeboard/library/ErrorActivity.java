@@ -1,15 +1,20 @@
 package com.mcmo.z.unenoticeboard.library;
 
-import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.DialogInterface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Process;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,8 +24,10 @@ import com.mcmo.z.unenoticeboard.library.info.InfoUtil;
 import com.mcmo.z.unenoticeboard.library.info.OsInfo;
 import com.mcmo.z.unenoticeboard.library.info.ScreenInfo;
 import com.mcmo.z.unenoticeboard.library.info.StorageInfo;
+import com.mcmo.z.unenoticeboard.library.util.FileUtils;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -29,6 +36,8 @@ public class ErrorActivity extends AppCompatActivity {
     private TextView tv_crash_info, tv_class_name, tv_method_name, tv_line_number, tv_error_type, tv_crash_time, tv_full_info;
     private TextView tv_other;
     private ExceptionInfo exceptionInfo;
+
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,21 +89,82 @@ public class ErrorActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int i = item.getItemId();
         if (i == R.id.menu_copyToClipboard) {
-            StringBuilder builder = new StringBuilder();
-            if (exceptionInfo != null) {
-                builder.append(exceptionInfo.format());
-            }
-            builder.append("\n");
-            builder.append(tv_other.getText().toString());
-            ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-            ClipData clipData = ClipData.newPlainText("text", builder.toString());
-            clipboardManager.setPrimaryClip(clipData);
-            Toast.makeText(this, "复制成功", Toast.LENGTH_SHORT).show();
+            copyToClipboard();
         } else if (i == R.id.menu_showErrorFolderPath) {
-            String path = getExternalCacheDir() + File.separator + UncaughtHandler.logFolder;
-            new AlertDialog.Builder(this).setTitle("日志地址").setMessage(path).setPositiveButton("确定",null).show();
+            showLogPathDialog();
+        } else if (i == R.id.menu_deleteLogFile) {
+            showDeleteLogDialog();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showDeleteLogDialog() {
+        View v = LayoutInflater.from(this).inflate(R.layout.dialog_delete_log_file, null, false);
+        final CheckBox cb = v.findViewById(R.id.cb_keep_today_file);
+        new AlertDialog.Builder(this).setTitle(R.string.delete_error_log_tip).setMessage(R.string.delete_error_log_msg).setView(v).setPositiveButton("sure", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                boolean delToday = cb.isChecked();
+                deleteLogFiles(delToday);
+            }
+        }).setNegativeButton("cancel", null).show();
+    }
+
+    private void deleteLogFiles(final boolean delToday) {
+        final String path = Cons.getLogFilePah(ErrorActivity.this);
+        showProgressDialog();
+        new AsyncTask() {
+            @Override
+            protected Object doInBackground(Object[] objects) {
+                if (delToday) {
+                    FileUtils.deleteFilesInDirWithFilter(path, new TodayFileFilter());
+                } else {
+                    FileUtils.deleteFilesInDir(path);
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Object o) {
+                super.onPostExecute(o);
+                dismissProgressDialog();
+                Toast.makeText(ErrorActivity.this,R.string.delete_log_success,Toast.LENGTH_SHORT).show();
+            }
+        }.execute();
+
+    }
+
+    private void showLogPathDialog() {
+        String path = Cons.getLogFilePah(this);
+        new AlertDialog.Builder(this).setTitle("日志地址").setMessage(path).setPositiveButton("确定", null).show();
+    }
+
+    private void copyToClipboard() {
+        StringBuilder builder = new StringBuilder();
+        if (exceptionInfo != null) {
+            builder.append(exceptionInfo.format());
+        }
+        builder.append("\n");
+        builder.append(tv_other.getText().toString());
+        ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        ClipData clipData = ClipData.newPlainText("text", builder.toString());
+        clipboardManager.setPrimaryClip(clipData);
+        Toast.makeText(this, "复制成功", Toast.LENGTH_SHORT).show();
+    }
+
+    private void showProgressDialog() {
+        if (progressDialog == null) {
+            progressDialog = new ProgressDialog(this);
+        }
+        if (!progressDialog.isShowing()) {
+            progressDialog.show();
+        }
+    }
+
+    private void dismissProgressDialog() {
+        if (progressDialog != null) {
+            progressDialog.dismiss();
+        }
     }
 
     @Override
@@ -102,5 +172,18 @@ public class ErrorActivity extends AppCompatActivity {
 //        super.onBackPressed();
         //回退会导致报错的界面又出现，重复报错，导致无法退出
         Process.killProcess(Process.myPid());
+    }
+
+    private class TodayFileFilter implements FileFilter {
+        private String todaySubfix;
+
+        public TodayFileFilter() {
+            todaySubfix = Cons.getTodayFileSubfix();
+        }
+
+        @Override
+        public boolean accept(File pathname) {
+            return !pathname.getName().startsWith(todaySubfix);
+        }
     }
 }

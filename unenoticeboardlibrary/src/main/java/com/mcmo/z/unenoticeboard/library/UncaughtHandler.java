@@ -5,10 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Process;
-import android.util.Log;
 
 import com.mcmo.z.unenoticeboard.library.info.ExceptionInfo;
 import com.mcmo.z.unenoticeboard.library.info.InfoUtil;
+import com.mcmo.z.unenoticeboard.library.util.FileIOUtils;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -16,13 +16,11 @@ import java.io.StringWriter;
 import java.util.Date;
 
 public class UncaughtHandler implements Thread.UncaughtExceptionHandler {
-    private final String ACTION = "com.mcmo.z.unenoticeboard.ERRORACT";
     private Context context;
     private boolean showInfoActivity;
     private Thread.UncaughtExceptionHandler mSystemDefaultUncaughtExceptionHandler;
-    public static final String logFolder = "uncaughtError";
     private String logBasePath;
-    public static final String KEY = "ErrorInfo";
+
 
     public static void init(Application context) {
         init(context, true);
@@ -40,7 +38,7 @@ public class UncaughtHandler implements Thread.UncaughtExceptionHandler {
     private UncaughtHandler(Application context, boolean showInfoActivity) {
         this.context = context;
         this.showInfoActivity = showInfoActivity;
-        this.logBasePath = context.getExternalCacheDir().getPath() + File.separator + logFolder;
+        this.logBasePath = Cons.getLogFilePah(context);
         mSystemDefaultUncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler();
     }
 
@@ -78,7 +76,7 @@ public class UncaughtHandler implements Thread.UncaughtExceptionHandler {
             @Override
             protected Object doInBackground(Object[] objects) {
                 String content = InfoUtil.createBaseInfoString(exceptionInfo);
-                FileIOUtils.writeFileFromString(logBasePath + File.separator + "ErrorLog_" + exceptionInfo.getTimeFormat(), content);
+                FileIOUtils.writeFileFromString(logBasePath + File.separator + Cons.getLogFileName(exceptionInfo.getTime()), content);
                 return null;
             }
         };
