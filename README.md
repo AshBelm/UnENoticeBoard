@@ -1,10 +1,9 @@
-package com.mcmo.z.unenoticeboard;
+# UnENoticeBoard
+未捕获异常记录工具。会在发生异常时记录日志并弹出错误信息提示。
 
-import android.app.Application;
-import android.content.ContextWrapper;
-
-import com.mcmo.z.unenoticeboard.library.UncaughtHandler;
-
+##初始化
+在项目的Application中调用初始化方法
+```
 public class MyApplication extends Application {
     @Override
     public void onCreate() {
@@ -13,6 +12,6 @@ public class MyApplication extends Application {
         if(BuildConfig.DEBUG){
             UncaughtHandler.init(this);
         }
-
     }
 }
+```
